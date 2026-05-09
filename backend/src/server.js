@@ -1,3 +1,4 @@
+import { prisma, connectDB } from './config/db.js';
 import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -7,6 +8,7 @@ import authRoutes from './routes/auth.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import taskRoutes from './routes/task.routes.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
+import { Prisma } from '@prisma/client';
 
 // Load environment variables
 dotenv.config();
@@ -38,12 +40,14 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 
 // CORS configuration - restrict to frontend domain
+// CORS configuration - allowing both common dev ports
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [process.env.FRONTEND_URL, 'http://localhost:5174', 'http://localhost:5173'].filter(Boolean),
   credentials: true,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
+
 
 // Body parsing middleware
 app.use(express.json());
@@ -62,11 +66,31 @@ const authLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 
 // Health check endpoint (before routes)
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString()
-  });
+
+app.get('/health', async (req, res) => {
+  const healthStatus = {
+    status: 'ok', // This represents the Server itself
+    database: 'unknown',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  };
+
+  try {
+    // 1. Try to "ping" the database
+    await prisma.$queryRaw`SELECT 1`;
+    healthStatus.database = 'connected';
+    
+    // If everything is perfect, send 200 OK
+    res.status(200).json(healthStatus);
+  } catch (error) {
+    // 2. If DB fails, we don't kill the whole response
+    // We update the status and send a 503 (Service Unavailable)
+    healthStatus.status = 'error';
+    healthStatus.database = 'disconnected';
+    healthStatus.message = error.message;
+
+    res.status(503).json(healthStatus);
+  }
 });
 
 // API Routes
@@ -81,8 +105,12 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`CORS enabled for: ${corsOptions.origin}`);
-});
+const start = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`CORS enabled for: ${corsOptions.origin}`);
+  }) ;
+ };
+ start();
+

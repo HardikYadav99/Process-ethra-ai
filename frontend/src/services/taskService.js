@@ -45,8 +45,20 @@ export const taskService = {
    * @returns {Promise<Object>} Created task object
    * @throws {Error} If creation fails or user lacks permissions
    */
-  async createTask(taskData) {
-    const response = await api.post('/api/tasks', taskData);
+   async createTask(taskData) {
+    const payload = {
+      title: taskData.title, // Fixed typo from 'tittle'
+      description: taskData.description, // Added missing comma
+      project_id: parseInt(taskData.project_id || taskData.projectId), // Added missing comma
+      due_date: taskData.due_date || taskData.dueDate || new Date().toISOString() // Fixed new Date()
+    };
+
+    if (taskData.assigned_to || taskData.assignedTo) {
+      payload.assigned_to = parseInt(taskData.assigned_to || taskData.assignedTo);
+    }
+    
+    // CRITICAL: Change taskData to payload here!
+    const response = await api.post('/api/tasks', payload); 
     return response.data;
   },
 

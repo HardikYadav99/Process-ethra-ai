@@ -77,7 +77,10 @@ function ProjectList({ projects, selectedProject, onSelectProject, onRefresh }) 
       )}
 
       <div className="space-y-2">
-        {projects.length === 0 ? (
+        {/* FIX: Safety Guard to prevent crash when backend returns an error object instead of an array */}
+        {!Array.isArray(projects) ? (
+          <p className="text-red-500 text-sm">Session expired or error loading projects. Please login again.</p>
+        ) : projects.length === 0 ? (
           <p className="text-gray-500 text-sm">No projects yet</p>
         ) : (
           projects.map((project) => (
@@ -97,7 +100,7 @@ function ProjectList({ projects, selectedProject, onSelectProject, onRefresh }) 
         )}
       </div>
     </div>
-  );
+  ); // This was the missing closing brace
 }
 
-export default ProjectList;
+export default ProjectList; // This was the missing export

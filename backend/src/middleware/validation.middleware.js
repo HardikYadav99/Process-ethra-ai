@@ -66,19 +66,18 @@ export const taskValidation = [
     .optional()
     .trim(),
   body('due_date')
-    .notEmpty()
-    .withMessage('Due date is required')
+    .optional({checkFalsy: true })
     .isISO8601()
     .withMessage('Invalid date format. Use ISO 8601 format (YYYY-MM-DD)'),
+
   body('assigned_to')
     .optional({ nullable: true })
-    .isInt({ min: 1 })
-    .withMessage('Assignee ID must be a positive integer'),
+    .isInt({ min: 1 }),
   body('project_id')
-    .notEmpty()
-    .withMessage('Project ID is required')
+
+    .optional()
+    .toInt()
     .isInt({ min: 1 })
-    .withMessage('Project ID must be a positive integer')
 ];
 
 /**
@@ -90,7 +89,7 @@ export const statusValidation = [
   body('status')
     .notEmpty()
     .withMessage('Status is required')
-    .isIn(['To Do', 'In Progress', 'Done'])
+    .isIn(['TODO', 'In Progress', 'Done'])
     .withMessage('Status must be one of: To Do, In Progress, Done')
 ];
 

@@ -24,7 +24,8 @@ function TaskList({ tasks, selectedProject, onRefresh }) {
         body: JSON.stringify({
           title,
           description,
-          projectId: selectedProject.id,
+          project_id: parseInt(selectedProject.id),
+          due_date: new Date().toISOString(),
         }),
       });
 

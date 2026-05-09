@@ -1,5 +1,5 @@
 import { hashPassword, verifyPassword } from '../password.util.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 /**
  * Unit tests for password utilities
@@ -16,7 +16,7 @@ describe('Password Utilities', () => {
       expect(hash.length).toBeGreaterThan(0);
     });
 
-    test('should use bcrypt with 10 salt rounds', async () => {
+    test('should use bcryptjs with 10 salt rounds', async () => {
       const password = 'testPassword123';
       const hash = await hashPassword(password);
       
@@ -41,12 +41,12 @@ describe('Password Utilities', () => {
       expect(hash.length).toBeGreaterThan(0);
     });
 
-    test('should produce bcrypt-compatible hash format', async () => {
+    test('should produce bcryptjs-compatible hash format', async () => {
       const password = 'testPassword123';
       const hash = await hashPassword(password);
       
       // Verify the hash can be used with bcrypt.compare
-      const isValid = await bcrypt.compare(password, hash);
+      const isValid = await bcryptjs.compare(password, hash);
       expect(isValid).toBe(true);
     });
   });
