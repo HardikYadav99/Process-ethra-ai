@@ -5,11 +5,11 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "npx prisma generate && npx prisma db push && node src/server.js",
     "dev": "node --watch src/server.js",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
-    "build": "echo 'No build step required for Node.js'",
+    "build": "npx prisma generate",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [
