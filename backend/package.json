@@ -5,13 +5,12 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "npx prisma generate && npx prisma db push --accept-data-loss && node src/server.js",
-    "dev": "node --watch src/server.js",
-    "migrate": "prisma migrate dev",
-    "generate": "prisma generate",
     "build": "npx prisma generate",
+    "start": "npx prisma db push --accept-data-loss && node src/server.js",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
-  },
+},
   "keywords": [
     "task-manager",
     "express",
